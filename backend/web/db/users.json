@@ -1,0 +1,41 @@
+[
+  {
+    "username": "admin",
+    "password_hash": "admin",
+    "access_rights": {
+      "read": true,
+      "write": true,
+      "edit": true
+    },
+    "jwt_token": "",
+    "activation_token": "",
+    "is_active": true,
+    "score": 777
+  },
+  {
+    "username": "support",
+    "password_hash": "support",
+    "access_rights": {
+      "read": true,
+      "write": true,
+      "edit": false
+    },
+    "jwt_token": "",
+    "activation_token": "",
+    "is_active": true,
+    "score": 10
+  },
+  {
+    "username": "user",
+    "password_hash": "user",
+    "access_rights": {
+      "read": true,
+      "write": false,
+      "edit": false
+    },
+    "jwt_token": "",
+    "activation_token": "",
+    "is_active": true,
+    "score": 0
+  }
+]

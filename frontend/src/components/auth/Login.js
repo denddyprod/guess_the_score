@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Alert from '@material-ui/lab/Alert';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -13,16 +14,10 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'© '}
-            <Link color="inherit" href="/">
-                Guess the Score - World Cup  2022
-      </Link>
-        </Typography>
-    );
-}
+import Copyright from './Copyright'
+import { useHistory } from "react-router-dom";
+
+import AuthService from "../../services/auth.service";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -55,8 +50,27 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function SignInSide() {
+export default function SignInSide(props) {
+    let history = useHistory();
     const classes = useStyles();
+
+    const [errorMsg, setErrorMsg] = useState('');
+
+    const handleSubmit = async (event) => {
+        event.preventDefault()
+        let email = document.getElementById('email').value
+        let password = document.getElementById('password').value
+
+        AuthService.login(email, password).then(
+            () => {
+                props.setLogged(true)
+                history.push("/dashboard");
+            },
+            error => {
+                setErrorMsg(error.response.data.errorMsg)
+            }
+        );
+    }
 
     return (
         <Grid container component="main" className={classes.root}>
@@ -95,12 +109,15 @@ export default function SignInSide() {
                             control={<Checkbox value="remember" color="primary" />}
                             label="Remember me"
                         />
+                        {errorMsg &&
+                            <Alert severity="error">{errorMsg}</Alert>}
                         <Button
                             type="submit"
                             fullWidth
                             variant="contained"
                             color="primary"
                             className={classes.submit}
+                            onClick={handleSubmit}
                         >
                             Sign In
                         </Button>

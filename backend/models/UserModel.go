@@ -5,20 +5,21 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 )
 
 // User represents the user model stored in our database
 type User struct {
-	Id              primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	Username        string             `json:"username" bson:"username"`
-	PasswordHash    string             `json:"password_hash" bson:"password_hash"`
-	Password        string             `json:"-" bson:"-"`
-	JWToken         string             `json:"jwt_token" bson:"jwt_token"`
-	ActivationToken string             `json:"activation_token" bson:"activation_token"`
-	AccessRights    AccessRights       `json:"access_rights" bson:"access_rights"`
-	IsActive        bool               `json:"is_active" bson:"is_active"`
-	Score           int                `json:"score" bson:"score"`
+	Id           primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Email     string             `json:"email" bson:"email"`
+	Username     string             `json:"username" bson:"username"`
+	PasswordHash string             `json:"password_hash" bson:"password_hash"`
+	Password     string             `json:"password" bson:"-"`
+	UUID         string             `json:"uuid" bson:"uuid"`
+	AccessRights AccessRights       `json:"access_rights" bson:"access_rights"`
+	IsActive     bool               `json:"is_active" bson:"is_active"`
+	Score        int                `json:"score" bson:"score"`
 }
 
 type AccessRights struct {
@@ -30,7 +31,8 @@ type AccessRights struct {
 type UserModel interface {
 	// Methods for querying for single user
 	FindById(id primitive.ObjectID) (*User, error)
-	FindByUsername(username string) (*User, error)
+	FindByEmail(email string) (*User, error)
+	FindByUUID(token string) (*User, error)
 
 	// This function validate all fields for create and update
 	Validate(user *User, action string) error
@@ -39,6 +41,8 @@ type UserModel interface {
 	Create(user *User) error
 	Update(user *User) error
 	Delete(id primitive.ObjectID) error
+
+	GetTop() ([]User, error)
 }
 
 var _ UserModel = &userValidator{}
@@ -64,11 +68,27 @@ func (ug *userMongo) FindById(id primitive.ObjectID) (*User, error) {
 	return &resultUser, nil
 }
 
-func (ug *userMongo) FindByUsername(username string) (*User, error) {
+func (ug *userMongo) FindByUUID(uuidToken string) (*User, error) {
 	usersCollection := ug.servs.db.Collection("users")
 	var resultUser User
 
-	filter := bson.D{{"username", username}}
+	filter := bson.D{{"uuid", uuidToken}}
+
+	err := usersCollection.FindOne(context.TODO(), filter).Decode(&resultUser)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Found a single document: %+v\n", resultUser)
+
+	return &resultUser, nil
+}
+
+func (ug *userMongo) FindByEmail(email string) (*User, error) {
+	usersCollection := ug.servs.db.Collection("users")
+	var resultUser User
+
+	filter := bson.D{{"email", email}}
 
 	err := usersCollection.FindOne(context.TODO(), filter).Decode(&resultUser)
 	if err != nil {
@@ -81,7 +101,6 @@ func (ug *userMongo) FindByUsername(username string) (*User, error) {
 }
 
 func (ug *userMongo) Validate(user *User, action string) error {
-
 	return nil
 }
 
@@ -125,4 +144,25 @@ func (ug *userMongo) Delete(id primitive.ObjectID) error {
 
 	fmt.Printf("Deleted object with _id: %v \n", id)
 	return nil
+}
+
+func (ug *userMongo) GetTop() ([]User, error) {
+	findOptions := options.Find()
+	// Sort by `score` field descending
+	findOptions.SetSort(bson.D{{"score", 1}})
+
+	usersCollection := ug.servs.db.Collection("users")
+	var results []User
+
+	cursor, err := usersCollection.Find(context.TODO(), bson.D{}, findOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cursor.All(context.TODO(), &results); err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Extracted all matches: %+v\n", results)
+	return results, nil
 }

@@ -23,6 +23,8 @@ func NewServices(cfgs ...ServicesConfig) (*Services, error) {
 
 type Services struct {
 	User UserService
+	Match MatchModel
+	Prediction PredictionModel
 
 	clientDB *mongo.Client
 	db       *mongo.Database
@@ -32,6 +34,20 @@ type Services struct {
 func WithUserService() ServicesConfig {
 	return func(s *Services) error {
 		s.User = NewUserService(s)
+		return nil
+	}
+}
+
+func WithMatchModel() ServicesConfig {
+	return func(s *Services) error {
+		s.Match = NewMatchModel(s)
+		return nil
+	}
+}
+
+func WithPredictionModel() ServicesConfig {
+	return func(s *Services) error {
+		s.Prediction = NewPredictionModel(s)
 		return nil
 	}
 }

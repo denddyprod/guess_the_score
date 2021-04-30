@@ -1,0 +1,12 @@
+[
+  {
+    "match_id": {
+      "$oid": "608ac011064a0a4dc4b060ef"
+    },
+    "user_id": {
+    "$oid": "606c499e00b039a3472cc8c7"
+    },
+    "teamA_score": 1,
+    "teamB_score": 2
+  }
+]

@@ -13,7 +13,7 @@ import Container from '@material-ui/core/Container';
 import AuthService from "../../services/auth.service";
 import { useHistory } from "react-router-dom";
 import Alert from '@material-ui/lab/Alert';
-
+import { useTranslation } from "react-i18next";
 import Copyright from './Copyright'
 
 const useStyles = makeStyles((theme) => ({
@@ -39,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SignUp() {
   const classes = useStyles();
   let history = useHistory();
+  const { t } = useTranslation();
 
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -78,7 +79,7 @@ export default function SignUp() {
                 required
                 fullWidth
                 id="email"
-                label="Email Address"
+                label={t("email_address")}
                 name="email"
                 autoComplete="email"
               />
@@ -89,7 +90,7 @@ export default function SignUp() {
                 required
                 fullWidth
                 id="username"
-                label="Username"
+                label={t("username")}
                 name="username"
                 autoComplete="username"
               />
@@ -100,7 +101,7 @@ export default function SignUp() {
                 required
                 fullWidth
                 name="password"
-                label="Password"
+                label={t("password")}
                 type="password"
                 id="password"
                 autoComplete="current-password"
@@ -123,12 +124,12 @@ export default function SignUp() {
             className={classes.submit}
             onClick={handleSubmit}
           >
-            Sign Up
+            {t("register_button")}
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
               <Link href="/" variant="body2">
-                Already have an account? Sign in
+                {t("try_login")}
               </Link>
             </Grid>
           </Grid>

@@ -1,7 +1,10 @@
 import React from 'react';
 import './notfound.css'
+import { useTranslation } from "react-i18next";
 
 function NotFound() {
+  const { t } = useTranslation();
+
   return (<div id="main">
   
   <div className="fof">
@@ -9,7 +12,7 @@ function NotFound() {
     <h1>Error 404</h1>
 
   </a>
-    <br /><h2>Page not found!</h2><h3></h3>
+    <br /><h2>{t("page_not_found")}</h2>
 
   </div>
 </div>

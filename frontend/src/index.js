@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import "./i18n";
 
 // using ES6 modules
 import { BrowserRouter } from "react-router-dom";

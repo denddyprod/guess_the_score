@@ -7,9 +7,9 @@ import Header from './Header';
 import MainFeaturedPost from './MainFeaturedPost';
 import FeaturedPost from './FeaturedPost';
 import Footer from './Footer';
-import BusinessService from "../../services/business.service";
-import Button from '@material-ui/core/Button';
-import AuthService from "../../services/auth.service";
+import UserService from "../../services/user.service";
+import AddMatch from './AddMatch'
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   mainGrid: {
@@ -20,50 +20,52 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const sections = [
-  { title: 'Matches', url: '/dashboard' },
-  { title: 'My profile', url: '/profile' },
-  { title: 'Leaderboard', url: '/leaderboard' },
-];
-
-const mainFeaturedPost = {
-  title: 'Can You Guess the World Cup Final Score ?',
-  description:
-    "Football Quiz",
-  image: 'https://source.unsplash.com/featured/?soccer',
-};
 
 export default function Dashboard() {
   const classes = useStyles();
   let [featuredPosts, setFeaturedPosts] = useState([])
+  const { t } = useTranslation();
 
-  useEffect(async () => {
-    let results = await BusinessService.allMatches()
-    setFeaturedPosts(results)
+  const mainFeaturedPost = {
+    title: t("banner_title"),
+    description:
+      t("banner_desc"),
+    image: 'https://source.unsplash.com/featured/?soccer',
+  };
+
+  const sections = [
+    { title: t("menu_matches"), url: '/dashboard' },
+    { title: t("menu_profile"), url: '/profile' },
+    { title: t("menu_leaderboard"), url: '/leaderboard' },
+  ];
+
+  useEffect(() => {
+    async function getAllMatches()  {
+      const results = await UserService.allMatches()
+      setFeaturedPosts(results)
+    }
+    getAllMatches()
   },[]);
 
   return (
     <React.Fragment>
       <CssBaseline />
       <Container maxWidth="lg">
-        <Header title="World Cup 2021 - Guess the score" sections={sections} />
+        <Header title={t("header_title")} sections={sections} />
         <main>
           <MainFeaturedPost post={mainFeaturedPost} />
           <Grid container justify="flex-end" className={classes.pad}>
-          {
-            AuthService.canEdit() &&
-            <Button variant="contained" color="primary" > Add match </Button>
-          }
+            <AddMatch featuredPosts={featuredPosts} setFeaturedPosts={setFeaturedPosts}/>
           </Grid>
 
           <Grid container spacing={4}>
             {featuredPosts.map((post) => (
-              <FeaturedPost key={post._id} post={post} />
+              <FeaturedPost key={post._id} post={post} featuredPosts={featuredPosts} setFeaturedPosts={setFeaturedPosts}/>
             ))}
           </Grid>
         </main>
       </Container>
-      <Footer title="PW 2021" description="Proiect implementat în cadrul materiei de Programare Web" />
+      <Footer title="PW 2021" description={t("footer_desc")} />
      
      
     </React.Fragment>

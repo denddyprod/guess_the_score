@@ -14,8 +14,10 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import EditMatch from "./EditMatch";
+import { useTranslation } from "react-i18next";
 import AuthService from "../../services/auth.service";
-
+import UserService from "../../services/user.service";
 
 const useStyles = makeStyles({
   card: {
@@ -32,19 +34,32 @@ const useStyles = makeStyles({
   },
 });
 
+const user = AuthService.getCurrentUser()
+
 export default function FeaturedPost(props) {
+  const { t } = useTranslation();
   const classes = useStyles();
   const { post } = props;
 
   const [open, setOpen] = React.useState(false);
-  
+
   const handleClickOpen = () => {
     setOpen(true);
   };
-  
+
   const handleClose = () => {
     setOpen(false);
   };
+
+  function addPrediction() {
+    let matchId = props.post._id
+    let userId = user.Id
+    let teamAScore = document.getElementById('teamA_score').value
+    let teamBScore = document.getElementById('teamB_score').value
+    console.log(matchId, userId, teamAScore, teamBScore)
+    UserService.addPrediction(matchId, userId, teamAScore, teamBScore)
+    handleClose()
+  }
 
   return (
     <Grid item xs={12} md={6}>
@@ -62,38 +77,38 @@ export default function FeaturedPost(props) {
                 {post.group}
               </Typography>
               <Typography variant="subtitle1" color="primary">
-                Place a bet
+                {t("place_bet")}
               </Typography>
             </CardContent>
           </div>
           <Hidden xsDown>
-            <CardMedia className={classes.cardMedia} image={post.image}/>
+            <CardMedia className={classes.cardMedia} image={post.image} />
           </Hidden>
         </Card>
       </CardActionArea>
-      { AuthService.canEdit() && <Button color="primary" > EDIT MATCH </Button> }
-      { AuthService.canEdit() && <Button color="secondary" > DELETE MATCH </Button> }
       
+      <EditMatch post={props.post} featuredPosts={props.featuredPosts} setFeaturedPosts={props.setFeaturedPosts}/>
+
 
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" fullWidth="true" maxWidth="xs">
-        <DialogTitle id="form-dialog-title">Place your bet</DialogTitle>
+        <DialogTitle id="form-dialog-title">{t("place_match_title")}</DialogTitle>
         <DialogContent>
-        <Grid container spacing={2} alignItems="center" justify="center">
-          <Grid item xs={3}>
-            <TextField id="standard-basic" type="number" inputProps={{ min: "0", max: "20", step: "1" }} label={post.teamA} fullWidth="true"/>
+          <Grid container spacing={2} alignItems="center" justify="center">
+            <Grid item xs={3}>
+              <TextField id="teamA_score" type="number" inputProps={{ min: "0", max: "20", step: "1" }} label={post.teamA} fullWidth="true" />
+            </Grid>
+            <p className={classes.vsText}>vs</p>
+            <Grid item xs={3}>
+              <TextField id="teamB_score" type="number" inputProps={{ min: "0", max: "20", step: "1" }} label={post.teamB} fullWidth="true" />
+            </Grid>
           </Grid>
-          <p className={classes.vsText}>vs</p>
-          <Grid item xs={3}>
-            <TextField id="standard-basic" type="number" inputProps={{ min: "0", max: "20", step: "1" }} label={post.teamB} fullWidth="true"/>
-          </Grid>
-        </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            Cancel
+            {t("cancel")}
           </Button>
-          <Button onClick={handleClose} color="primary">
-            Bet
+          <Button onClick={addPrediction} color="primary">
+            {t("bet")}
           </Button>
         </DialogActions>
       </Dialog>

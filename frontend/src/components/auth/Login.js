@@ -13,11 +13,10 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-
 import Copyright from './Copyright'
 import { useHistory } from "react-router-dom";
-
 import AuthService from "../../services/auth.service";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -53,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SignInSide(props) {
     let history = useHistory();
     const classes = useStyles();
+    const { t } = useTranslation();
 
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -90,7 +90,7 @@ export default function SignInSide(props) {
                             required
                             fullWidth
                             id="email"
-                            label="Email Address"
+                            label={t("email_address")}
                             name="email"
                             autoComplete="email"
                             autoFocus
@@ -100,14 +100,14 @@ export default function SignInSide(props) {
                             required
                             fullWidth
                             name="password"
-                            label="Password"
+                            label={t("password")}
                             type="password"
                             id="password"
                             autoComplete="current-password"
                         />
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
-                            label="Remember me"
+                            label={t("remember")}
                         />
                         {errorMsg &&
                             <Alert severity="error">{errorMsg}</Alert>}
@@ -119,7 +119,7 @@ export default function SignInSide(props) {
                             className={classes.submit}
                             onClick={handleSubmit}
                         >
-                            Sign In
+                            {t("login_button")}
                         </Button>
                         <Grid container>
                             <Grid item xs>
@@ -129,7 +129,7 @@ export default function SignInSide(props) {
                             </Grid>
                             <Grid item>
                                 <Link href="/register" variant="body2">
-                                    {"Don't have an account? Sign Up"}
+                                    {t("try_sign_up")}
                                 </Link>
                             </Grid>
                         </Grid>

@@ -12,7 +12,7 @@ import (
 // User represents the user model stored in our database
 type User struct {
 	Id           primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	Email     string             `json:"email" bson:"email"`
+	Email        string             `json:"email" bson:"email"`
 	Username     string             `json:"username" bson:"username"`
 	PasswordHash string             `json:"password_hash" bson:"password_hash"`
 	Password     string             `json:"password" bson:"-"`
@@ -149,7 +149,7 @@ func (ug *userMongo) Delete(id primitive.ObjectID) error {
 func (ug *userMongo) GetTop() ([]User, error) {
 	findOptions := options.Find()
 	// Sort by `score` field descending
-	findOptions.SetSort(bson.D{{"score", 1}})
+	findOptions.SetSort(bson.D{{"score", -1}})
 
 	usersCollection := ug.servs.db.Collection("users")
 	var results []User
@@ -163,6 +163,6 @@ func (ug *userMongo) GetTop() ([]User, error) {
 		return nil, err
 	}
 
-	fmt.Printf("Extracted all matches: %+v\n", results)
+	fmt.Printf("Extracted top users: %+v\n", results)
 	return results, nil
 }

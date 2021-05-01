@@ -7,6 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
+import { useTranslation } from "react-i18next";
 
 import AuthService from '../../services/auth.service'
 import { useHistory } from "react-router-dom";
@@ -30,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Header(props) {
   const classes = useStyles();
+  const { t } = useTranslation();
   const { sections, title } = props;
   let history = useHistory();
 
@@ -56,7 +58,7 @@ export default function Header(props) {
           <SearchIcon />
         </IconButton>
         <Button variant="outlined" size="small" onClick={Logout}>
-          Logout
+          {t("logout")}
         </Button>
       </Toolbar>
       <Toolbar component="nav" variant="dense" className={classes.toolbarSecondary}>

@@ -14,11 +14,23 @@ import (
 )
 
 type RequireUser struct {
-	UserService        models.UserService
+	UserService models.UserService
+}
+
+func setupCorsResponse(w *http.ResponseWriter, req *http.Request) {
+	(*w).Header().Set("Content-Type", "application/json")
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
 }
 
 func (self *RequireUser) Required(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		setupCorsResponse(&w, r)
+		if (*r).Method == "OPTIONS" {
+			return
+		}
+
 		tokenString, err := extractToken(r)
 		if err != nil {
 			log.Println("Token not provided or malformed")
@@ -42,10 +54,10 @@ func (self *RequireUser) Required(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		var username string
+		var email string
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if ok && token.Valid {
-			username, ok =  claims["username"].(string)
+			email, ok = claims["email"].(string)
 			if !ok {
 				log.Println(constants.ErrClaimsExtract.Error())
 				data := map[string]string{"success": "false", "errorMsg": constants.ErrClaimsExtract.Error()}
@@ -59,11 +71,11 @@ func (self *RequireUser) Required(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		log.Println(username)
+		log.Println(email)
 
-		user, err := self.UserService.FindByUsername(username)
+		user, err := self.UserService.FindByEmail(email)
 		if err != nil {
-			log.Println(constants.ErrNotFound.Error(), username)
+			log.Println(constants.ErrNotFound.Error(), email)
 			data := map[string]string{"success": "false", "errorMsg": constants.ErrNotFound.Error()}
 			views.SendResponse(w, data, http.StatusForbidden)
 			return
@@ -78,6 +90,7 @@ func (self *RequireUser) Required(next http.HandlerFunc) http.HandlerFunc {
 
 func extractToken(r *http.Request) (string, error) {
 	authHeader := r.Header.Get("Authorization")
+
 	authHeaderContent := strings.Split(authHeader, " ")
 	if len(authHeaderContent) != 2 {
 		return "", errors.New("Token not provided or malformed")

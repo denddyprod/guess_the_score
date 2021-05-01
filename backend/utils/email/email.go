@@ -6,15 +6,13 @@ import (
 	"net/smtp"
 )
 
-
-
 type Email struct {
 	From string
-	To string
+	To   string
 	Text string
 
 	SupportEmail string
-	Password string
+	Password     string
 
 	SmtpHost string
 	SmtpPort string
@@ -31,7 +29,7 @@ func (self *Email) Init() {
 	self.SmtpPort = "587"
 }
 
-func (self *Email) Send(token, toEmail string) error{
+func (self *Email) Send(token, toEmail string) error {
 	self.To = toEmail
 	self.Text = token
 	// Authentication.
@@ -50,11 +48,11 @@ func (self *Email) Send(token, toEmail string) error{
 func (self *Email) ToBytes() []byte {
 	buf := bytes.NewBuffer(nil)
 
-	buf.WriteString("Subject: Activation link\n")
-	buf.WriteString("MIME-Version: 1.0\n")
+	buf.WriteString("Subject: Activation link\r\n")
+	buf.WriteString("MIME-Version: 1.0\r\n")
 
-	buf.WriteString("Content-Type: text/plain; charset=utf-8\n")
-	buf.WriteString("Your activation link is: \n" + "www.localhost:5000/activation/" + self.Text)
+	buf.WriteString("Content-Type: text/plain; charset=utf-8\r\n" + "\r\n")
+	buf.WriteString("Your activation link is: \n" + "www.localhost:3000/activation/" + self.Text)
 	buf.WriteString("\r\n")
 
 	return buf.Bytes()

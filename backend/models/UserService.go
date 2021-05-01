@@ -86,15 +86,13 @@ func (us *userService) SendActivationLink(user *User) error {
 	activationEmail.Init()
 	log.Println(activationEmail)
 
-	err := activationEmail.Send(user.UUID, user.Username)
+	err := activationEmail.Send(user.UUID, user.Email)
 	if err != nil {
 		return err
 	}
 
-
 	return nil
 }
-
 
 func (us *userService) Activate(token string) error {
 	user, err := us.UserModel.FindByUUID(token)
@@ -125,11 +123,11 @@ func (us *userService) ParseAndVerifyAccessToken(myToken string) error {
 	return nil
 }
 
-func (us *userService) GenerateAccessToken(username string) (string, error) {
+func (us *userService) GenerateAccessToken(email string) (string, error) {
 	mySigningKey := []byte("shhhhhh")
 
 	claims := jwt.MapClaims{}
-	claims["username"] = username
+	claims["email"] = email
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

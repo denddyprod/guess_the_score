@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gorilla/mux"
 	"guess_the_score/backend/controllers"
+	"guess_the_score/backend/middleware"
 	"guess_the_score/backend/models"
 
 	"log"
@@ -28,30 +29,31 @@ func main() {
 	authController := controllers.NewAuthController(services.User)
 	userController := controllers.NewUserController(services.User)
 	matchController := controllers.NewMatchController(services.Match)
-	predictionController := controllers.NewPredictionController(services.Prediction)
+	predictionController := controllers.NewPredictionController(services.Match, services.Prediction)
 
-	// Initiate all midlewares
-	//userMW := middleware.RequireUser{
-	//	UserService:        services.User,
-	//}
+	//Initiate all midlewares
+	userMW := middleware.RequireUser{
+		UserService: services.User,
+	}
 
 	// Initiate all server routes
 	r := mux.NewRouter()
 	r.HandleFunc("/register", authController.Register).Methods(http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/login", authController.Login).Methods(http.MethodPost, http.MethodOptions)
-	r.HandleFunc("/activation/{token}", authController.Activation).Methods("GET")
+	r.HandleFunc("/activation/{token}", authController.Activation).Methods(http.MethodGet, http.MethodOptions)
 
 	//r.HandleFunc("/users/{id}", userMW.Required(userController.Index)).Methods("GET")
-	r.HandleFunc("/users/top", userController.GetTop).Methods("GET")
+	r.HandleFunc("/users/top", userMW.Required(userController.GetTop)).Methods(http.MethodGet, http.MethodOptions)
 	//r.HandleFunc("/users/", authController.Update).Methods("PUT")
 	//r.HandleFunc("/users/", authController.Delete).Methods("DELETE")
 
-	r.HandleFunc("/matches", matchController.GetAll).Methods(http.MethodGet, http.MethodOptions)
-	r.HandleFunc("/matches", matchController.Create).Methods(http.MethodPost, http.MethodOptions)
-	r.HandleFunc("/matches/{id}", matchController.Update).Methods(http.MethodPut, http.MethodOptions)
-	r.HandleFunc("/matches/{id}", matchController.Delete).Methods(http.MethodDelete, http.MethodOptions)
+	r.HandleFunc("/matches", userMW.Required(matchController.GetAll)).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/matches", userMW.Required(matchController.Create)).Methods(http.MethodPost, http.MethodOptions)
+	r.HandleFunc("/matches/{id}", userMW.Required(matchController.Update)).Methods(http.MethodPut, http.MethodOptions)
+	r.HandleFunc("/matches/{id}", userMW.Required(matchController.Delete)).Methods(http.MethodDelete, http.MethodOptions)
 
-	r.HandleFunc("/predictions/{id}", predictionController.GetAllByUserId).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/predictions/{id}", userMW.Required(predictionController.GetAllByUserId)).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/predictions", userMW.Required(predictionController.Create)).Methods(http.MethodPost, http.MethodOptions)
 
 	defer func() {
 		// Close Database connection

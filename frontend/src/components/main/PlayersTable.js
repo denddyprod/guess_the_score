@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -7,6 +7,8 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import UserService from "../../services/user.service";
+import { useTranslation } from "react-i18next";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -30,11 +32,11 @@ function createData(name, score, predictions) {
   return { name, score, predictions};
 }
 
-const rows = [
-  createData('denddyprod', 777, 67),
-  createData('edward', 123, 12),
-  createData('florinsalam', 691, 37),
-];
+// const rows = [
+//   createData('denddyprod', 777, 67),
+//   createData('edward', 123, 12),
+//   createData('florinsalam', 691, 37),
+// ];
 
 const useStyles = makeStyles({
   table: {
@@ -44,20 +46,28 @@ const useStyles = makeStyles({
 
 export default function CustomizedTables() {
   const classes = useStyles();
+  const { t } = useTranslation();
 
-  function calcCoefficient(score, prediction) {
-    return (score / prediction).toFixed(2);
-  }
+  let [rows, setRows] = useState([])
+
+  useEffect(() => {
+    async function getTop()  {
+      const results = await UserService.getTopPlayers()
+      const rows = results.map((user) => (
+        createData(user.username, user.score, 2)
+      ))
+      setRows(rows)
+    }
+    getTop()
+  },[]);
 
   return (
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell>Player name</StyledTableCell>
-            <StyledTableCell align="right">Score</StyledTableCell>
-            <StyledTableCell align="right">Predictions</StyledTableCell>
-            <StyledTableCell align="right">Coefficient</StyledTableCell>
+            <StyledTableCell>{t("player_name")}</StyledTableCell>
+            <StyledTableCell align="right">{t("score")}</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -67,8 +77,6 @@ export default function CustomizedTables() {
                 {row.name}
               </StyledTableCell>
               <StyledTableCell align="right">{row.score}</StyledTableCell>
-              <StyledTableCell align="right">{row.predictions}</StyledTableCell>
-              <StyledTableCell align="right">{calcCoefficient(row.score,row.predictions)}</StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>

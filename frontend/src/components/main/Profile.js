@@ -10,7 +10,8 @@ import Footer from './Footer';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '../avatar.png'
 import AuthService from "../../services/auth.service";
-
+import { useTranslation } from "react-i18next";
+import Predictions from './PredictionsTable';
 
 const useStyles = makeStyles((theme) => ({
   mainGrid: {
@@ -23,29 +24,30 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const sections = [
-  { title: 'Matches', url: '/dashboard' },
-  { title: 'My profile', url: '/profile' },
-  { title: 'Leaderboard', url: '/leaderboard' },
-];
-
-const mainFeaturedPost = {
-  title: 'My profile',
-  description:
-    "This page is all about you",
-  image: 'https://source.unsplash.com/random',
-};
-
 const user = AuthService.getCurrentUser()
 
 export default function ProfilePage() {
   const classes = useStyles();
+  const { t } = useTranslation();
+
+  const mainFeaturedPost = {
+    title: t("menu_profile"),
+    description:
+      t("title_profile"),
+    image: 'https://source.unsplash.com/random',
+  };
+  
+  const sections = [
+    { title: t("menu_matches"), url: '/dashboard' },
+    { title: t("menu_profile"), url: '/profile' },
+    { title: t("menu_leaderboard"), url: '/leaderboard' },
+  ];
 
   return (
     <React.Fragment>
       <CssBaseline />
       <Container maxWidth="lg">
-        <Header title="World Cup 2021 - Guess the score" sections={sections} />
+        <Header title={t("header_title")} sections={sections} />
         <main>
           <MainFeaturedPost post={mainFeaturedPost} />
           <Grid container spacing={3} justify="center" alignItems="center">
@@ -55,23 +57,27 @@ export default function ProfilePage() {
                         <img src={Avatar} alt=""/>
                     </Typography>
                     <Typography variant="h6">
-                        Email: {user.Email}
+                        {t("email_address")}: {user.Email}
                     </Typography>
                     <Typography variant="h6">
-                        Username: {user.Username}
+                    {t("username")}: {user.Username}
                     </Typography>
                     <Typography variant="h6">
-                        Score: {user.Score}
+                    {t("score")}: {user.Score}
                     </Typography>
                     {/* <Typography variant="h6">
                         Predictions: 13
                     </Typography> */}
                 </Paper>
             </Grid>
+            <Grid item xs={12}>
+              <h3>{t("history")}</h3>
+                <Predictions/>
+            </Grid>
           </Grid>
         </main>
       </Container>
-      <Footer title="PW 2021" description="Proiect implementat în cadrul materiei de Programare Web" />
+      <Footer title="PW 2021" description={t("footer_desc")} />
      
      
     </React.Fragment>

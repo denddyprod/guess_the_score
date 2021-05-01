@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"guess_the_score/backend/models"
 	"guess_the_score/backend/views"
 	"net/http"
@@ -18,5 +19,12 @@ type UserController struct {
 
 func (self *UserController) GetTop(w http.ResponseWriter, r *http.Request) {
 
-	views.SendResponse(w, "privet", http.StatusOK)
+	topUsers, err := self.us.GetTop()
+	if err != nil {
+		fmt.Println(err)
+		data := map[string]string{"success": "false", "errorMsg": err.Error()}
+		views.SendResponse(w, data, http.StatusForbidden)
+	}
+
+	views.SendResponse(w, topUsers, http.StatusOK)
 }

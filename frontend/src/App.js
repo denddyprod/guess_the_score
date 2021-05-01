@@ -11,19 +11,18 @@ import AuthService from "./services/auth.service";
 
 function App() {
   const [isLogged, setLogged] = useState(AuthService.isLogged());
-
   return (
     <main>
-      <Router>
-        <Switch>
-          <Route path="/" component={() => <Login setLogged={setLogged} />} exact/>
-          <Route path="/register" component={Register} exact />
-          <Route path="/dashboard" component={isLogged ? Dashboard : Login}/>
-          <Route path="/profile" component={isLogged ? Profile : Login} />
-          <Route path="/leaderboard" component={isLogged ? Leaderboard : Login} />
-          <Route component={NotFound} />
-        </Switch>
-      </Router>
+        <Router>
+          <Switch>
+            <Route path="/" component={isLogged ? Dashboard : () => <Login setLogged={setLogged} />} exact/>
+            <Route path="/register" component={Register} exact />
+            <Route path="/dashboard" component={isLogged ? Dashboard : () => <Login setLogged={setLogged} />}/>
+            <Route path="/profile" component={isLogged ? Profile : () => <Login setLogged={setLogged} />} />
+            <Route path="/leaderboard" component={isLogged ? Leaderboard : () => <Login setLogged={setLogged} />} />
+            <Route component={NotFound} />
+          </Switch>
+        </Router>
     </main>
   )
 }

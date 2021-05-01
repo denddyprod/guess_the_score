@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"guess_the_score/backend/models"
 	"guess_the_score/backend/utils/constants"
@@ -45,6 +47,14 @@ func (self *AuthController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, err = self.us.FindByEmail(newUser.Email)
+	if err != nil {
+		log.Println(err)
+		data := map[string]string{"success": "false", "errorMsg": constants.ErrRegisteredEmail.Error()}
+		views.SendResponse(w, data, http.StatusForbidden)
+		return
+	}
+
 	err = self.us.Validate(newUser, "create")
 	if err != nil {
 		log.Println(err)
@@ -73,13 +83,13 @@ func (self *AuthController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//err = self.us.SendActivationLink(newUser)
-	//if err != nil {
-	//	log.Println(err)
-	//	data := map[string]string{"success": "false", "errorMsg": errors.New("Internal Server Error").Error()}
-	//	views.SendResponse(w, data, http.StatusForbidden)
-	//	return
-	//}
+	err = self.us.SendActivationLink(newUser)
+	if err != nil {
+		log.Println(err)
+		data := map[string]string{"success": "false", "errorMsg": errors.New("Internal Server Error").Error()}
+		views.SendResponse(w, data, http.StatusForbidden)
+		return
+	}
 	data := map[string]string{"success": "true"}
 	views.SendResponse(w, data, http.StatusCreated)
 }
@@ -108,7 +118,7 @@ func (self *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := self.us.GenerateAccessToken(resUser.Username)
+	token, err := self.us.GenerateAccessToken(resUser.Email)
 	if err != nil {
 		log.Println(err)
 		data := map[string]string{"errorMsg": constants.ErrInternalServer.Error()}
@@ -116,13 +126,15 @@ func (self *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res := struct {
-		Token string
+		Token        string
+		Id           primitive.ObjectID
 		AccessRights models.AccessRights
-		Email string
-		Username string
-		Score int
+		Email        string
+		Username     string
+		Score        int
 	}{
 		token,
+		resUser.Id,
 		resUser.AccessRights,
 		resUser.Email,
 		resUser.Username,

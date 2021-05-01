@@ -13,15 +13,19 @@ func NewPredictionModel(services *Services) PredictionModel {
 }
 
 type Prediction struct {
-	Id           primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	MatchId     primitive.ObjectID             `json:"match_id" bson:"match_id,omitempty"`
-	UserId primitive.ObjectID             `json:"user_id" bson:"user_id,omitempty"`
-	TeamAScore     uint32             `json:"teamA_score" bson:"teamA_score,omitempty"`
-	TeamBScore      uint32             `json:"teamB_score" bson:"teamB_score,omitempty"`
+	Id         primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	MatchId    primitive.ObjectID `json:"match_id" bson:"match_id,omitempty"`
+	UserId     primitive.ObjectID `json:"user_id" bson:"user_id,omitempty"`
+	TeamAScore string             `json:"teamA_score" bson:"teamA_score,omitempty"`
+	TeamBScore string             `json:"teamB_score" bson:"teamB_score,omitempty"`
 }
 
 type PredictionModel interface {
 	FindByUserId(userId primitive.ObjectID) ([]Prediction, error)
+
+	Create(prediction *Prediction) error
+	Update(prediction *Prediction) error
+	Delete(id primitive.ObjectID) error
 }
 
 var _ PredictionModel = &predictionMongo{}
@@ -56,7 +60,7 @@ func (pm predictionMongo) Create(prediction *Prediction) error {
 		return err
 	}
 
-	log.Println("Created match with id=", res.InsertedID)
+	log.Println("Created prediction with id=", res.InsertedID)
 	return nil
 }
 

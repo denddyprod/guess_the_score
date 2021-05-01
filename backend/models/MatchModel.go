@@ -13,16 +13,16 @@ func NewMatchModel(services *Services) MatchModel {
 }
 
 type Match struct {
-	Id           primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	TeamA     string             `json:"teamA" bson:"teamA"`
+	Id    primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	TeamA string             `json:"teamA" bson:"teamA"`
 	TeamB string             `json:"teamB" bson:"teamB"`
-	Group     string             `json:"group" bson:"group"`
-	Date      string             `json:"date" bson:"date"`
-	Image         string             `json:"image" bson:"image"`
+	Group string             `json:"group" bson:"group"`
+	Date  string             `json:"date" bson:"date"`
+	Image string             `json:"image" bson:"image"`
 }
 
 type MatchModel interface {
-	//FindById(id primitive.ObjectID) (*Match, error)
+	FindById(id primitive.ObjectID) (*Match, error)
 	FindAll() ([]Match, error)
 	//
 	Create(match *Match) error
@@ -34,6 +34,22 @@ var _ MatchModel = &matchMongo{}
 
 type matchMongo struct {
 	servs *Services
+}
+
+func (mg *matchMongo) FindById(id primitive.ObjectID) (*Match, error) {
+	var resultMatch Match
+	matchesCollection := mg.servs.db.Collection("matches")
+
+	filter := bson.D{{"_id", id}}
+
+	err := matchesCollection.FindOne(context.TODO(), filter).Decode(&resultMatch)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Found a single document: %+v\n", resultMatch)
+
+	return &resultMatch, nil
 }
 
 func (mg *matchMongo) FindAll() ([]Match, error) {

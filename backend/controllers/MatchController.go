@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"guess_the_score/backend/models"
 	"guess_the_score/backend/utils/constants"
+	"guess_the_score/backend/utils/context"
 	"guess_the_score/backend/views"
 	"log"
 	"net/http"
@@ -45,6 +46,14 @@ func (self *MatchController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user := context.User(r.Context())
+	if user.AccessRights.Write == false {
+		fmt.Println("no sufficient rights")
+		data := map[string]string{"errorMsg": constants.ErrNoAccessRights.Error()}
+		views.SendResponse(w, data, http.StatusForbidden)
+		return
+	}
+
 	var match *models.Match
 
 	decoder := json.NewDecoder(r.Body)
@@ -70,6 +79,14 @@ func (self *MatchController) Create(w http.ResponseWriter, r *http.Request) {
 func (self *MatchController) Update(w http.ResponseWriter, r *http.Request) {
 	setupCorsResponse(&w, r)
 	if (*r).Method == "OPTIONS" {
+		return
+	}
+
+	user := context.User(r.Context())
+	if user.AccessRights.Edit == false {
+		fmt.Println("no sufficient rights")
+		data := map[string]string{"errorMsg": constants.ErrNoAccessRights.Error()}
+		views.SendResponse(w, data, http.StatusForbidden)
 		return
 	}
 
@@ -108,6 +125,13 @@ func (self *MatchController) Update(w http.ResponseWriter, r *http.Request) {
 func (self *MatchController) Delete(w http.ResponseWriter, r *http.Request) {
 	setupCorsResponse(&w, r)
 	if (*r).Method == "OPTIONS" {
+		return
+	}
+
+	user := context.User(r.Context())
+	if user.AccessRights.Edit == false {
+		data := map[string]string{"errorMsg": constants.ErrNoAccessRights.Error()}
+		views.SendResponse(w, data, http.StatusForbidden)
 		return
 	}
 

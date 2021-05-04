@@ -145,10 +145,13 @@ func (self *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (self *AuthController) Activation(w http.ResponseWriter, r *http.Request) {
+	setupCorsResponse(&w, r)
+	if (*r).Method == "OPTIONS" {
+		return
+	}
+
 	params := mux.Vars(r)
 	tokenUUID := params["token"]
-
-	log.Println(tokenUUID)
 
 	if tokenUUID == "" {
 		views.SendResponse(w, nil, http.StatusForbidden)

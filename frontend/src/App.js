@@ -8,6 +8,7 @@ import Dashboard from './components/main/Dashboard';
 import Profile from './components/main/Profile';
 import Leaderboard from './components/main/Leaderboard';
 import AuthService from "./services/auth.service";
+import Activation from './components/auth/Activation';
 
 function App() {
   const [isLogged, setLogged] = useState(AuthService.isLogged());
@@ -20,6 +21,7 @@ function App() {
             <Route path="/dashboard" component={isLogged ? Dashboard : () => <Login setLogged={setLogged} />}/>
             <Route path="/profile" component={isLogged ? Profile : () => <Login setLogged={setLogged} />} />
             <Route path="/leaderboard" component={isLogged ? Leaderboard : () => <Login setLogged={setLogged} />} />
+            <Route path="/activation/:id" component={Activation} exact/>
             <Route component={NotFound} />
           </Switch>
         </Router>

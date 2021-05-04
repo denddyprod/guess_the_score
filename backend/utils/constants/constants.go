@@ -14,4 +14,5 @@ var (
 	ErrNoPassword         = errors.New("Password is required.")
 	ErrIncorrectPassEmail = errors.New("Email or password is incorect. Please, try again.")
 	ErrRegisteredEmail = errors.New("Email is already used. Please, try to sign in or  to use another email.")
+	ErrNoAccessRights = errors.New("No sufficient access rights.")
 )

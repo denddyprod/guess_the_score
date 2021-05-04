@@ -30,6 +30,10 @@ class AuthService {
         });
     }
 
+    activate(id) {
+        return axios.get(API_URL + "activation/" + id, {});
+    }
+
     isLogged() {
         return localStorage.getItem('user') !== null
     }

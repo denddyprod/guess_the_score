@@ -17,14 +17,28 @@
     "teamA": "Bangladesh",
     "teamB": "Namibia",
     "group": "Group B",
-    "date": "18 October",
+    "date": "25 October",
     "image": "https://source.unsplash.com/featured/?soccer3"
   },
   {
     "teamA": "Netherlands",
     "teamB": "Scotland",
     "group": "Group B",
-    "date": "18 October",
+    "date": "25 October",
+    "image": "https://source.unsplash.com/featured/?soccer5"
+  },
+  {
+    "teamA": "Italy",
+    "teamB": "Switzerland",
+    "group": "Group C",
+    "date": "21 October",
+    "image": "https://source.unsplash.com/featured/?soccer5"
+  },
+  {
+    "teamA": "Northern Ireland",
+    "teamB": "Bulgaria",
+    "group": "Group C",
+    "date": "21 October",
     "image": "https://source.unsplash.com/featured/?soccer5"
   }
 ]

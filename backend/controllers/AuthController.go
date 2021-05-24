@@ -47,8 +47,8 @@ func (self *AuthController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = self.us.FindByEmail(newUser.Email)
-	if err != nil {
+	found, err := self.us.FindByEmail(newUser.Email)
+	if found != nil {
 		log.Println(err)
 		data := map[string]string{"success": "false", "errorMsg": constants.ErrRegisteredEmail.Error()}
 		views.SendResponse(w, data, http.StatusForbidden)

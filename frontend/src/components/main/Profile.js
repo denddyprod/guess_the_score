@@ -42,7 +42,7 @@ export default function ProfilePage() {
     { title: t("menu_profile"), url: '/profile' },
     { title: t("menu_leaderboard"), url: '/leaderboard' },
   ];
-
+  
   return (
     <React.Fragment>
       <CssBaseline />

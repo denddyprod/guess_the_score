@@ -21,17 +21,36 @@ type Prediction struct {
 }
 
 type PredictionModel interface {
+	FindAll() ([]Prediction, error)
 	FindByUserId(userId primitive.ObjectID) ([]Prediction, error)
 
 	Create(prediction *Prediction) error
 	Update(prediction *Prediction) error
 	Delete(id primitive.ObjectID) error
+	DeleteAllByUserId(userId primitive.ObjectID) error
 }
 
 var _ PredictionModel = &predictionMongo{}
 
 type predictionMongo struct {
 	servs *Services
+}
+
+func (pm predictionMongo) FindAll() ([]Prediction, error) {
+	var results []Prediction
+
+	predictionCollection := pm.servs.db.Collection("predictions")
+
+	cursor, err := predictionCollection.Find(context.TODO(), bson.D{})
+	if err != nil {
+		return nil, err
+	}
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Extracted all predictions: %+v\n", results)
+	return results, nil
 }
 
 func (pm predictionMongo) FindByUserId(userId primitive.ObjectID) ([]Prediction, error) {
@@ -90,5 +109,19 @@ func (pm predictionMongo) Delete(id primitive.ObjectID) error {
 	}
 
 	fmt.Printf("Deleted object with _id: %v \n", id)
+	return nil
+}
+
+func (pm predictionMongo) DeleteAllByUserId(userId primitive.ObjectID) error {
+	predictionCollection := pm.servs.db.Collection("predictions")
+
+	filter := bson.M{"user_id": userId}
+
+	_, err := predictionCollection.DeleteMany(context.TODO(), filter)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Deleted object with user_id: %v \n", userId)
 	return nil
 }

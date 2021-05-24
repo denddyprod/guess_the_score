@@ -29,6 +29,8 @@ type AccessRights struct {
 }
 
 type UserModel interface {
+	FindAll() ([]User, error)
+
 	// Methods for querying for single user
 	FindById(id primitive.ObjectID) (*User, error)
 	FindByEmail(email string) (*User, error)
@@ -50,6 +52,24 @@ var _ UserModel = &userMongo{}
 
 type userMongo struct {
 	servs *Services
+}
+
+
+func (ug *userMongo) FindAll() ([]User, error) {
+	usersCollection := ug.servs.db.Collection("users")
+	var results []User
+
+	cursor, err := usersCollection.Find(context.TODO(), bson.D{})
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cursor.All(context.TODO(), &results); err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Extracted all users: %+v\n", results)
+	return results, nil
 }
 
 func (ug *userMongo) FindById(id primitive.ObjectID) (*User, error) {
@@ -166,3 +186,5 @@ func (ug *userMongo) GetTop() ([]User, error) {
 	fmt.Printf("Extracted top users: %+v\n", results)
 	return results, nil
 }
+
+

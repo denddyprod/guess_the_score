@@ -11,6 +11,10 @@ import (
 	"time"
 )
 
+// TODO
+// 2. link
+// 3. demo datas
+
 func main() {
 	var cfg *Config
 	cfg, err := LoadConfig()
@@ -27,7 +31,7 @@ func main() {
 
 	// Initiate controllers
 	authController := controllers.NewAuthController(services.User)
-	userController := controllers.NewUserController(services.User)
+	userController := controllers.NewUserController(services.User, services.Prediction)
 	matchController := controllers.NewMatchController(services.Match)
 	predictionController := controllers.NewPredictionController(services.Match, services.Prediction)
 
@@ -42,18 +46,25 @@ func main() {
 	r.HandleFunc("/login", authController.Login).Methods(http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/activation/{token}", authController.Activation).Methods(http.MethodGet, http.MethodOptions)
 
+	r.HandleFunc("/users", userMW.Required(userController.GetAll)).Methods(http.MethodGet, http.MethodOptions)
 	//r.HandleFunc("/users/{id}", userMW.Required(userController.Index)).Methods("GET")
 	r.HandleFunc("/users/top", userMW.Required(userController.GetTop)).Methods(http.MethodGet, http.MethodOptions)
 	//r.HandleFunc("/users/", authController.Update).Methods("PUT")
 	//r.HandleFunc("/users/", authController.Delete).Methods("DELETE")
+	r.HandleFunc("/users/{id}", userMW.Required(userController.Update)).Methods(http.MethodPut, http.MethodOptions)
+	r.HandleFunc("/users/{id}", userMW.Required(userController.Delete)).Methods(http.MethodDelete, http.MethodOptions)
+
 
 	r.HandleFunc("/matches", userMW.Required(matchController.GetAll)).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/matches", userMW.Required(matchController.Create)).Methods(http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/matches/{id}", userMW.Required(matchController.Update)).Methods(http.MethodPut, http.MethodOptions)
 	r.HandleFunc("/matches/{id}", userMW.Required(matchController.Delete)).Methods(http.MethodDelete, http.MethodOptions)
 
+	r.HandleFunc("/predictions/matches", userMW.Required(predictionController.GetPredictionsByMatches)).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/predictions/scores", userMW.Required(predictionController.GetFavouriteScores)).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/predictions/{id}", userMW.Required(predictionController.GetAllByUserId)).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/predictions", userMW.Required(predictionController.Create)).Methods(http.MethodPost, http.MethodOptions)
+
 
 	defer func() {
 		// Close Database connection
@@ -72,7 +83,6 @@ func main() {
 
 	log.Println("Starting backend application on " + cfg.HTTPServer.Port)
 	log.Fatal(server.ListenAndServe())
-
 }
 
 func must(err error) {

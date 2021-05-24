@@ -8,9 +8,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import UserService from "../../services/user.service";
-import AuthService from "../../services/auth.service";
 import { useTranslation } from "react-i18next";
 import ClipLoader from "react-spinners/ClipLoader";
+import UsersTableRow from './UsersTableRow';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -22,16 +22,8 @@ const StyledTableCell = withStyles((theme) => ({
   },
 }))(TableCell);
 
-const StyledTableRow = withStyles((theme) => ({
-  root: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.action.hover,
-    },
-  },
-}))(TableRow);
-
-function createData(teamA, teamB, score) {
-  return { teamA , teamB, score};
+function createData(id, email, username, access, isActive, score) {
+  return {id, email , username, access, isActive, score};
 }
 
 const useStyles = makeStyles({
@@ -40,28 +32,22 @@ const useStyles = makeStyles({
   },
 });
 
-const user = AuthService.getCurrentUser()
-
-export default function PredictionsTable() {
+export default function UsersTable() {
   const classes = useStyles();
   const { t } = useTranslation();
 
   let [rows, setRows] = useState(null)
 
   useEffect(() => {
-    async function getPredictions()  {
-      const results = await UserService.getUserPredictions(user.Id)
-      if (results !== null) {
-        const rows = results.map((pred) => (
-          createData(pred.TeamAName, pred.TeamBName, pred.TeamAScore + " - " + pred.TeamBScore)
-        ))
-        setRows(rows)
-      } else {
-        setRows(false)
-      }
+    async function getUsers()  {
+      const results = await UserService.allUsers()
+      const rows = results.map((user) => (
+        createData(user._id, user.email, user.username, user.access_rights['read']+","+user.access_rights['write']+","+user.access_rights['edit'], user.is_active, user.score)
+      ))
+      setRows(rows)
       console.log(rows)
     }
-    getPredictions()
+    getUsers()
   },[]);
 
   if (rows)
@@ -70,30 +56,22 @@ export default function PredictionsTable() {
         <Table className={classes.table} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell>{t("teamA")}</StyledTableCell>
-              <StyledTableCell >{t("teamB")}</StyledTableCell>
-              <StyledTableCell align="right">{t("score")}</StyledTableCell>
+              <StyledTableCell>Email</StyledTableCell>
+              <StyledTableCell >{t("username")}</StyledTableCell>
+              <StyledTableCell >{t("access_rights_group")}</StyledTableCell>
+              <StyledTableCell >{t("is_active_text")}</StyledTableCell>
+              <StyledTableCell >{t("score")}</StyledTableCell>
+              <StyledTableCell align="right">{t("actions_text")}</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => (
-              <StyledTableRow key={row.teamA}>
-                <StyledTableCell component="th" scope="row">
-                  {row.teamA}
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row">
-                  {row.teamB}
-                </StyledTableCell>
-                <StyledTableCell align="right">{row.score}</StyledTableCell>
-              </StyledTableRow>
+              <UsersTableRow  rows={rows} row={row} setRows={setRows}/>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
     );
-  else if (rows === false)
-    return <div><center> nothing to display </center></div>
-  else
+  else 
     return <div><center> <ClipLoader size={150} /></center></div>
-
 }

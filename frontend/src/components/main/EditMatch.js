@@ -61,8 +61,8 @@ export default function EditMatch(props) {
 
   return (
     <React.Fragment>
-      { AuthService.canEdit() && <Button color="primary" onClick={handleClickOpen}>{t("edit_button")}</Button>}
-      { AuthService.canEdit() && <Button color="secondary" onClick={deleteMatch}> {t("delete_button")} </Button>}
+      { AuthService.canWrite() && <Button color="primary" onClick={handleClickOpen}>{t("edit_button")}</Button>}
+      { AuthService.canWrite() && <Button color="secondary" onClick={deleteMatch}> {t("delete_button")} </Button>}
       <div>
 
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">

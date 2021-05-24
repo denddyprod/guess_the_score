@@ -74,6 +74,18 @@ export default function Header(props) {
             {section.title}
           </Link>
         ))}
+        {AuthService.canEdit() && AuthService.canWrite() &&
+        <Link
+          color="error"
+          noWrap
+          key="admin"
+          variant="body2"
+          href="/admin"
+          className={classes.toolbarLink}
+        >
+            {t("admin_panel")}
+        </Link>
+        }
       </Toolbar>
     </React.Fragment>
   );

@@ -55,6 +55,10 @@ func (us *userService) Authenticate(user *User) (*User, error) {
 	}
 
 	dbUser, err := us.UserModel.FindByEmail(user.Email)
+	if err != nil {
+		fmt.Println(err)
+		return nil, constants.ErrIncorrectPassEmail
+	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(dbUser.PasswordHash), []byte(user.Password))
 	if err != nil {

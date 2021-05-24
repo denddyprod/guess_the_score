@@ -10,6 +10,7 @@ import Footer from './Footer';
 import UserService from "../../services/user.service";
 import AddMatch from './AddMatch'
 import { useTranslation } from "react-i18next";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const useStyles = makeStyles((theme) => ({
   mainGrid: {
@@ -47,27 +48,28 @@ export default function Dashboard() {
     getAllMatches()
   },[]);
 
-  return (
-    <React.Fragment>
-      <CssBaseline />
-      <Container maxWidth="lg">
-        <Header title={t("header_title")} sections={sections} />
-        <main>
-          <MainFeaturedPost post={mainFeaturedPost} />
-          <Grid container justify="flex-end" className={classes.pad}>
-            <AddMatch featuredPosts={featuredPosts} setFeaturedPosts={setFeaturedPosts}/>
-          </Grid>
+  if(featuredPosts)
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <Container maxWidth="lg">
+          <Header title={t("header_title")} sections={sections} />
+          <main>
+            <MainFeaturedPost post={mainFeaturedPost} />
+            <Grid container justify="flex-end" className={classes.pad}>
+              <AddMatch featuredPosts={featuredPosts} setFeaturedPosts={setFeaturedPosts}/>
+            </Grid>
 
-          <Grid container spacing={4}>
-            {featuredPosts.map((post) => (
-              <FeaturedPost key={post._id} post={post} featuredPosts={featuredPosts} setFeaturedPosts={setFeaturedPosts}/>
-            ))}
-          </Grid>
-        </main>
-      </Container>
-      <Footer title="PW 2021" description={t("footer_desc")} />
-     
-     
-    </React.Fragment>
-  );
+            <Grid container spacing={4}>
+              {featuredPosts.map((post) => (
+                <FeaturedPost key={post._id} post={post} featuredPosts={featuredPosts} setFeaturedPosts={setFeaturedPosts}/>
+              ))}
+            </Grid>
+          </main>
+        </Container>
+        <Footer title="PW 2021" description={t("footer_desc")} />
+      </React.Fragment>
+    );
+  else
+    return <div><center> <ClipLoader size={150} /></center></div>
 }

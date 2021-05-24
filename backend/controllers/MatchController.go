@@ -83,7 +83,7 @@ func (self *MatchController) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := context.User(r.Context())
-	if user.AccessRights.Edit == false {
+	if user.AccessRights.Write == false {
 		fmt.Println("no sufficient rights")
 		data := map[string]string{"errorMsg": constants.ErrNoAccessRights.Error()}
 		views.SendResponse(w, data, http.StatusForbidden)
@@ -129,7 +129,7 @@ func (self *MatchController) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := context.User(r.Context())
-	if user.AccessRights.Edit == false {
+	if user.AccessRights.Write == false {
 		data := map[string]string{"errorMsg": constants.ErrNoAccessRights.Error()}
 		views.SendResponse(w, data, http.StatusForbidden)
 		return

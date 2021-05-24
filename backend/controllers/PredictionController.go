@@ -94,3 +94,101 @@ func (self *PredictionController) Create(w http.ResponseWriter, r *http.Request)
 
 	views.SendResponse(w, nil, http.StatusOK)
 }
+
+func (self *PredictionController) GetPredictionsByMatches(w http.ResponseWriter, r *http.Request) {
+	setupCorsResponse(&w, r)
+	if (*r).Method == "OPTIONS" {
+		return
+	}
+
+	predictions, err := self.pm.FindAll()
+	if err != nil {
+		fmt.Println(err)
+		data := map[string]string{"success": "false", "errorMsg": err.Error()}
+		views.SendResponse(w, data, http.StatusForbidden)
+		return
+	}
+
+	type response struct {
+		Name string
+		Count int
+	}
+
+	var resPredictions []*response
+	for _, prediction := range predictions {
+		match, err := self.mm.FindById(prediction.MatchId)
+		if err != nil {
+			continue
+		}
+
+		var res response
+		found := false
+		res.Name = match.TeamA + "-" + match.TeamB
+		res.Count = 1
+
+		if len(resPredictions) == 0 {
+			resPredictions = append(resPredictions, &res)
+		} else {
+			for _, item := range resPredictions {
+				if item.Name == res.Name {
+					item.Count = item.Count + 1
+					found = true
+					break
+				}
+			}
+
+			if found == false {
+				resPredictions = append(resPredictions, &res)
+			}
+
+		}
+	}
+	views.SendResponse(w, resPredictions, http.StatusOK)
+}
+
+func (self *PredictionController) GetFavouriteScores(w http.ResponseWriter, r *http.Request) {
+	setupCorsResponse(&w, r)
+	if (*r).Method == "OPTIONS" {
+		return
+	}
+
+	predictions, err := self.pm.FindAll()
+	if err != nil {
+		fmt.Println(err)
+		data := map[string]string{"success": "false", "errorMsg": err.Error()}
+		views.SendResponse(w, data, http.StatusForbidden)
+		return
+	}
+
+	type response struct {
+		Score string
+		Count int
+	}
+
+	var resPredictions []*response
+	for _, prediction := range predictions {
+
+		var res response
+		found := false
+		res.Score = prediction.TeamAScore + "-" + prediction.TeamBScore
+		res.Count = 1
+
+		if len(resPredictions) == 0 {
+			resPredictions = append(resPredictions, &res)
+		} else {
+			for _, item := range resPredictions {
+				if item.Score == res.Score {
+					item.Count = item.Count + 1
+					found = true
+					break
+				}
+			}
+
+			if found == false {
+				resPredictions = append(resPredictions, &res)
+			}
+
+		}
+	}
+	views.SendResponse(w, resPredictions, http.StatusOK)
+}

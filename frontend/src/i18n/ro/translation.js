@@ -39,4 +39,18 @@ export const TRANSLATIONS_RO = {
     player_name: "Numele jucatorului",
     add_match: "ADAUGĂ MECI",
     history: "Istoria ultimelor 100 predictii",
+    admin_panel: "Panela de control",
+    update_title: "Actualizați",
+    user_details_text: "Detalii utilizator",
+    access_rights_text: "Drepturi de acces",
+    is_active_text: "Este activ?",
+    actions_text: "Acțiuni",
+    access_rights_group: "Citire, Scriere, Editează",
+    users_list: "Lista utilizatorilor",
+    player_scores: "Scorul jucătorului",
+    prediction_by_matches: "Predicții pe meciuri",
+    favourite_scores: "Scorurile preferate",
+    manage_users: "Gestionare utilizatori",
+    sign_in: "Autentificare",
+    sign_up: "Creare cont"
 };

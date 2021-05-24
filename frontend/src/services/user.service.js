@@ -12,6 +12,30 @@ class UserService {
             });
     }
 
+    allUsers() {
+        return axios
+            .get(API_URL + "users", { headers: authHeader()})
+            .then(response => {
+                return response.data;
+            });
+    }
+
+    getPredictiosByMatches() {
+        return axios
+            .get(API_URL + "predictions/matches", { headers: authHeader()})
+            .then(response => {
+                return response.data;
+            });
+    }
+
+    getFavouriteScores() {
+        return axios
+            .get(API_URL + "predictions/scores", { headers: authHeader()})
+            .then(response => {
+                return response.data;
+            });
+    }
+
     addMatch(teamA, teamB, group, date, image) {
         return axios
             .post(API_URL + "matches", {
@@ -36,6 +60,15 @@ class UserService {
             });
     }
 
+    deleteUser(id) {
+        return axios
+            .delete(API_URL + "users/" + id, { headers: authHeader()})
+            .then(response => {
+                console.log(response.data)
+                return response.data;
+            });
+    }
+
     editMatch(id, teamA, teamB, group, date, image) {
         return axios
             .put(API_URL + "matches/" + id, {
@@ -44,6 +77,21 @@ class UserService {
                 group,
                 date,
                 image
+            },{ headers: authHeader()})
+            .then(response => {
+                console.log(response.data)
+                return response.data;
+            });
+    }
+
+    updateuser(id, email, username, access, active, score) {
+        return axios
+            .put(API_URL + "users/" + id, {
+                email,
+                username,
+                "access_rights": access,
+                "is_active": active,
+                score
             },{ headers: authHeader()})
             .then(response => {
                 console.log(response.data)
